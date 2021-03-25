@@ -38,14 +38,43 @@ def customPRF512(key,A,B):
     return R[:blen]
 
 # Read capture file -- it contains beacon, authentication, associacion, handshake and data
-wpa=rdpcap("wpa_handshake.cap") 
+wpa=rdpcap("wpa_handshake.cap")
+
+#print(wpa.summary())
+for trame in wpa:
+    #Get the Association request
+    if(trame.subtype == 0x0 and trame.type == 0x0):
+        APmac       =  a2b_hex((trame.addr1).replace(':',''))
+        Clientmac   =  a2b_hex((trame.addr2).replace(':',''))
+        ssid        = trame.info.decode("ascii")
+        print(APmac)
+        print(Clientmac)
+        print(ssid)
+        break
+#print(wpa[1].FCfield)
+#print(wpa[6].subtype)
+#print(wpa[6].type)
+i = 0
+print(wpa[6].info)
+
+for trame in wpa:
+    if (i == 1):
+        SNonce = trame.info[13:45] #baaaaaaaaaaaad
+        print(trame.show())
+        print(SNonce)
+        break
+
+    if(trame.subtype == 0x0 and trame.type == 0x2 ):
+        ANonce = trame.load[13:45]
+        i += 1
+
 
 # Important parameters for key derivation - most of them can be obtained from the pcap file
 passPhrase  = "actuelle"
 A           = "Pairwise key expansion" #this string is used in the pseudo-random function
-ssid        = "SWI"
-APmac       = a2b_hex("cebcc8fdcab7")
-Clientmac   = a2b_hex("0013efd015bd")
+#ssid        = "SWI"
+#APmac       = a2b_hex("cebcc8fdcab7")
+#Clientmac   = a2b_hex("0013efd015bd")
 
 # Authenticator and Supplicant Nonces
 ANonce      = a2b_hex("90773b9a9661fee1f406e8989c912b45b029c652224e8b561417672ca7e0fd91")
