@@ -58,7 +58,9 @@ compteur = 0
 for trame in wpa:
     if trame.subtype == 0x0 and trame.type == 0x2 and a2b_hex(trame.addr2.replace(':', '')) == APmac and a2b_hex(trame.addr1.replace(':', '')) == Clientmac:
         ANonce = trame.getlayer(WPA_key).nonce
+        #BNonce = raw(trame)[67:99]
         #print(b"nous A : "+ANonce)
+        #print(b"nous A : "+BNonce)
         #print(b"prof A : "+a2b_hex("90773b9a9661fee1f406e8989c912b45b029c652224e8b561417672ca7e0fd91"))
         break
     compteur += 1
