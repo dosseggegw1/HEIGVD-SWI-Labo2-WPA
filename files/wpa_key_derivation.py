@@ -7,6 +7,8 @@ Derive WPA keys from Passphrase and 4-way handshake info
 Calcule un MIC d'authentification (le MIC pour la transmission de données
 utilise l'algorithme Michael. Dans ce cas-ci, l'authentification, on utilise
 sha-1 pour WPA2 ou MD5 pour WPA)
+
+Modified : Julien Béguin & Gwendoline Dössegger
 """
 
 __author__      = "Abraham Rubinstein et Yann Lederrey"
