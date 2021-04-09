@@ -86,3 +86,13 @@ Un fork du repo original . Puis, un Pull Request contenant **vos noms** et :
 ## Échéance
 
 Le 15 avril 2021 à 23h59
+
+
+
+
+
+### Remarque
+
+Nous avons eu plusieurs problème avec la lecture des trames avec scapy. Entre la version `2.4.3-4` et la version `2.4.4` de scapy, les types et subtypes des trames ne sont pas équivalent.
+
+Nous avons donc décidé d'utiliser la version `2.4.3-4` car nous obtenions des valeurs plus cohérente avec les valeurs observable sur wireshark.
