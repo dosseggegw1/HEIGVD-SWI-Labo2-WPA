@@ -42,7 +42,6 @@ def customPRF512(key, A, B):
 
 
 def main():
-    # Read capture file -- it contains beacon, authentication, associacion, handshake and data
     APmac = b''
     Clientmac = b''
     ANonce = b''
@@ -50,6 +49,7 @@ def main():
     crypto = b''
     mic_to_test = b''
 
+    # Read capture file -- it contains beacon, authentication, associacion, handshake and data
     wpa = rdpcap("wpa_handshake.cap")
 
     # The network to attack
@@ -105,8 +105,7 @@ def main():
     passPhrase = "actuelle"
     A = "Pairwise key expansion"  # this string is used in the pseudo-random function
     B = min(APmac, Clientmac) + max(APmac, Clientmac) + min(ANonce, SNonce) + max(ANonce, SNonce)  # used in pseudo-random function
-    data = a2b_hex(
-        "0103005f02030a0000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")  # cf "Quelques détails importants" dans la donnée
+    data = a2b_hex("0103005f02030a0000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")  # cf "Quelques détails importants" dans la donnée
 
     # This is the MIC contained in the 4th frame of the 4-way handshake
     # When attacking WPA, we would compare it to our own MIC calculated using passphrases from a dictionary
