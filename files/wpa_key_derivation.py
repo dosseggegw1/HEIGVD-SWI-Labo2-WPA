@@ -63,7 +63,6 @@ def main():
             Clientmac = a2b_hex(trame.addr2.replace(':', ''))
             break
 
-    compteur = 0
 
     # Get the ANonce based on the MAC address
     for trame in wpa:
@@ -74,28 +73,23 @@ def main():
 
             ANonce = trame.getlayer(WPA_key).nonce
             break
-        compteur += 1
 
-    dejaPasse = False
-    compteur2 = 0
+    isSNonceKnown = False
 
     for trame in wpa:
         # Get the SNonce based on the MAC address
-        if compteur2 > compteur \
-                and not (dejaPasse) \
+        if not isSNonceKnown \
                 and trame.subtype == 0x8 \
                 and trame.type == 0x2 \
                 and a2b_hex(trame.addr1.replace(':', '')) == APmac \
                 and a2b_hex(trame.addr2.replace(':', '')) == Clientmac:
 
             SNonce = raw(trame)[65:-72]
-            dejaPasse = True
-            compteur = compteur2
+            isSNonceKnown = True
 
 
         # Get the WPA key MIC
-        elif compteur2 > compteur \
-                and trame.subtype == 0x8 \
+        elif trame.subtype == 0x8 \
                 and trame.type == 0x2 \
                 and a2b_hex(trame.addr1.replace(':', '')) == APmac \
                 and a2b_hex(trame.addr2.replace(':', '')) == Clientmac:
@@ -105,7 +99,6 @@ def main():
             # Get the value of the key Information MD5 (1) or SHA1 (2)
             crypto = raw(trame)[0x36] & 0x2
 
-        compteur2 += 1
 
     # ---------------------------------------------------------------
     # Important parameters for key derivation - most of them can be obtained from the pcap file
