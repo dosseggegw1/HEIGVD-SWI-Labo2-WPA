@@ -89,6 +89,46 @@ Le 15 avril 2021 à 23h59
 
 
 
+---
+
+## <u>Rendu</u>
+
+### Partie 1
+
+Voici les étapes principales de notre script `wpa_key_derivation.py` :
+
+1. On récupère les adresses MAC de l'AP et du client avec la trame "Association Request" en filtrant avec le SSID ciblé
+2. On récupère le ANonce dans le premier paquet du 4-way handshake
+3. On récupère le SNonce dans le deuxième paquet du 4-way handshake
+4. Puis, on récupère le MIC ainsi que la valeur indiquant le méthode de hachage utilisé dans le quatrième paquet de 4-way handshake
+5. Enfin, la valeur du MIC récupéré doit être égal au MIC calculé
+
+
+
+### Partie 2
+
+Voici les étapes principales de notre script `scaircrack.py` :
+
+1. On effectue les 4 première étapes de la partie 1
+2. Pour chaque mot de la wordlist :
+   1. On calcul le MIC avec les paramètres récupéré
+   2. On test si le MIC calculé correspond on MIC récupéré
+   3. Si c'est le cas, cela veut dire que la passphrase testé est correcte.
+
+
+
+Exécution du script :
+
+![](step2.png)
+
+
+
+### Partie 3
+
+```python
+wpa = sniff(iface='wlp1s0mon', count=1000)
+```
+
 
 
 ### Remarque
