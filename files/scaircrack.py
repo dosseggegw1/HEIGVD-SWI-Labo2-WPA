@@ -106,6 +106,8 @@ def main():
 
     # Test chaque passPhrase
     for passPhrase in passPhrases:
+        print("[+] Testing passphrase:", passPhrase)
+
         # Important parameters for key derivation - most of them can be obtained from the pcap file
         A = "Pairwise key expansion"  # this string is used in the pseudo-random function
         B = min(APmac, Clientmac) + max(APmac, Clientmac) + min(ANonce, SNonce) + max(ANonce,
@@ -129,7 +131,7 @@ def main():
 
         # Test if the current passphrase is valid
         if mic_to_test == mic.hexdigest()[:32]:
-            print("You win ! The passphrase is : " + passPhrase.decode())
+            print("[#] You win ! The passphrase is : " + passPhrase.decode())
             break
 
 
