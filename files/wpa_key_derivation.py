@@ -20,10 +20,7 @@ __status__ 	= "Prototype"
 
 from scapy.all import *
 from binascii import a2b_hex, b2a_hex
-#from pbkdf2 import pbkdf2_hex
 from pbkdf2 import *
-from numpy import array_split
-from numpy import array
 import hmac, hashlib
 from scapy.contrib.wpa_eapol import WPA_key
 
@@ -42,6 +39,13 @@ def customPRF512(key,A,B):
 
 def main():
     # Read capture file -- it contains beacon, authentication, associacion, handshake and data
+    APmac = b''
+    Clientmac = b''
+    ANonce = b''
+    SNonce = b''
+    crypto = b''
+    mic_to_test = b''
+
     wpa=rdpcap("wpa_handshake.cap")
 
     #The network to attack
@@ -61,10 +65,6 @@ def main():
     for trame in wpa:
         if trame.subtype == 0x0 and trame.type == 0x2 and a2b_hex(trame.addr2.replace(':', '')) == APmac and a2b_hex(trame.addr1.replace(':', '')) == Clientmac:
             ANonce = trame.getlayer(WPA_key).nonce
-            #BNonce = raw(trame)[67:99]
-            #print(b"nous A : "+ANonce)
-            #print(b"nous A : "+BNonce)
-            #print(b"prof A : "+a2b_hex("90773b9a9661fee1f406e8989c912b45b029c652224e8b561417672ca7e0fd91"))
             break
         compteur += 1
 
@@ -73,19 +73,15 @@ def main():
 
     for trame in wpa:
         #Get the SNonce based on the MAC address
-        if compteur2 > compteur and not(dejaPasse) and trame.subtype == 0x0 and trame.type == 0x0 and raw(trame)[18:24] == APmac and  raw(trame)[24:30] == Clientmac :
+        if compteur2 > compteur and not(dejaPasse) and trame.subtype == 0x8 and trame.type == 0x2 and a2b_hex(trame.addr1.replace(':','')) == APmac and a2b_hex(trame.addr2.replace(':','')) == Clientmac:
             SNonce = raw(trame)[65:-72]
             dejaPasse = True
             compteur = compteur2
-            #print(b"nous S : "+SNonce)
-            #print(b"prof S : "+a2b_hex("7b3826876d14ff301aee7c1072b5e9091e21169841bce9ae8a3f24628f264577"))
 
 
         # Get the WPA key MIC
-        elif compteur2 > compteur and trame.subtype == 0x0 and trame.type == 0x0 and raw(trame)[18:24] == APmac and  raw(trame)[24:30] == Clientmac:
+        elif compteur2 > compteur and trame.subtype == 0x8 and trame.type == 0x2 and a2b_hex(trame.addr1.replace(':','')) == APmac and a2b_hex(trame.addr2.replace(':','')) == Clientmac:
             mic_to_test = raw(trame)[-18:-2].hex()
-            # print("nous mic : "+mic_to_test)
-            # print("prof mic : 36eef66540fa801ceee2fea9b7929b40")
 
             # Get the value of the key Information MD5 (1) or SHA1 (2)
             crypto = raw(trame)[0x36] & 0x2
@@ -99,12 +95,6 @@ def main():
     B           = min(APmac,Clientmac)+max(APmac,Clientmac)+min(ANonce,SNonce)+max(ANonce,SNonce) #used in pseudo-random function
     data        = a2b_hex("0103005f02030a0000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000") #cf "Quelques détails importants" dans la donnée
 
-    #ssid        = "SWI"
-    #APmac       = a2b_hex("cebcc8fdcab7")
-    #Clientmac   = a2b_hex("0013efd015bd")
-    # Authenticator and Supplicant Nonces
-    #ANonce      = a2b_hex("90773b9a9661fee1f406e8989c912b45b029c652224e8b561417672ca7e0fd91")
-    #SNonce      = a2b_hex("7b3826876d14ff301aee7c1072b5e9091e21169841bce9ae8a3f24628f264577")
 
     # This is the MIC contained in the 4th frame of the 4-way handshake
     # When attacking WPA, we would compare it to our own MIC calculated using passphrases from a dictionary
@@ -136,16 +126,16 @@ def main():
     #calculate MIC over EAPOL payload (Michael)- The ptk is, in fact, KCK|KEK|TK|MICK
     mic = hmac.new(ptk[0:16],data,hashlib.sha1)
 
-
-    print ("\nResults of the key expansion")
-    print ("=============================")
-    print ("PMK:\t\t",pmk.hex(),"\n")
-    print ("PTK:\t\t",ptk.hex(),"\n")
-    print ("KCK:\t\t",ptk[0:16].hex(),"\n")
-    print ("KEK:\t\t",ptk[16:32].hex(),"\n")
-    print ("TK:\t\t",ptk[32:48].hex(),"\n")
-    print ("MICK:\t\t",ptk[48:64].hex(),"\n")
-    print ("MIC:\t\t",mic.hexdigest(),"\n")
+    if mic_to_test == mic.hexdigest()[:32]:
+        print ("\nResults of the key expansion")
+        print ("=============================")
+        print ("PMK:\t\t",pmk.hex(),"\n")
+        print ("PTK:\t\t",ptk.hex(),"\n")
+        print ("KCK:\t\t",ptk[0:16].hex(),"\n")
+        print ("KEK:\t\t",ptk[16:32].hex(),"\n")
+        print ("TK:\t\t",ptk[32:48].hex(),"\n")
+        print ("MICK:\t\t",ptk[48:64].hex(),"\n")
+        print ("MIC:\t\t",mic.hexdigest(),"\n")
 
 if __name__ == '__main__':
     main()
