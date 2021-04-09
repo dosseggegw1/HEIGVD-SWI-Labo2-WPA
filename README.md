@@ -125,9 +125,15 @@ Exécution du script :
 
 ### Partie 3
 
+Dû à la structure existante de notre script `scaircrack.py`, il nous semblait facile de l'adapter pour la partie 3. Il suffirait de remplacer le SSID du réseau à attaquer ainsi que de remplacer la lecture du .cap par le sniffing d'une interface en mode moniteur comme ceci :
+
 ```python
 wpa = sniff(iface='wlp1s0mon', count=1000)
 ```
+
+
+
+Néanmoins, nous n'avions pas de réseau WPA à disposition et nous n'avons pas pu tester notre attaque.
 
 
 
