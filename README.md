@@ -93,6 +93,12 @@ Le 15 avril 2021 à 23h59
 
 ## <u>Rendu</u>
 
+> Auteurs : Julien Béguin & Gwendoline Dössegger
+>
+> Date : 09.04.2021
+
+
+
 ### Partie 1
 
 Voici les étapes principales de notre script `wpa_key_derivation.py` :
